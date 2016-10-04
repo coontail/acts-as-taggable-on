@@ -84,6 +84,7 @@ module ActsAsTaggableOn::Taggable
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn.default_parser.new(tags).parse
         options = options.dup
+
         empty_result = options[:allow_empty] ? where('1 = 1') : where('1 = 0')
 
         return empty_result if tag_list.empty?
@@ -221,12 +222,14 @@ module ActsAsTaggableOn::Taggable
 
         query = self
         query = self.select(select_clause.join(',')) unless select_clause.empty?
-        query.joins(joins.join(' '))
+        result = query.joins(joins.join(' '))
           .where(conditions.join(' AND '))
           .group(group)
           .having(having)
           .order(order_by.join(', '))
           .readonly(false)
+
+        result.empty? ? empty_result : result
       end
 
       def is_taggable?

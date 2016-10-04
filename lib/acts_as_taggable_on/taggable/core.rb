@@ -84,7 +84,7 @@ module ActsAsTaggableOn::Taggable
       def tagged_with(tags, options = {})
         tag_list = ActsAsTaggableOn.default_parser.new(tags).parse
         options = options.dup
-        empty_result = where('1 = 0')
+        empty_result = options.delete(:allow_empty) ? where('1 = 1') : where('1 = 0')
 
         return empty_result if tag_list.empty?
 
